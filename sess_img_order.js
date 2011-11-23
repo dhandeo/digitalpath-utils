@@ -1,5 +1,4 @@
-i = 0;
-db.sessions.find().forEach( function(sess) { db.sessions.update( {'_id':sess._id}, {$unset: {'images_new': 1}} ) } );
+//
 
 i = 0;
 db.sessions.find().forEach( 
