@@ -17,6 +17,7 @@ if len(sys.argv) < 3:
 # Get command line arguments 
 mongo = sys.argv[1]
 database = sys.argv[2]
+chapter = sys.argv[3]
 
 # connect with the database
 try:
@@ -28,7 +29,11 @@ except:
 	sys.exit(0)
 
 # Read chapters in the "chapters" collection and gather information about them
-chap = db['chapters'].find_one()
+chap = db['chapters'].find_one({'name':chapter})
+
+if chap == None:
+	print 'Chapter not found'
+	sys.exit(0)
 
 asession = db['sessions'].find_one({'chapter_id' : chap['_id']})
 if asession <> None:
@@ -36,7 +41,7 @@ if asession <> None:
 	print 'Removing ..'
 	db['sessions'].remove({'_id':asession['_id']})
 else:
-	print 'Not found ..'
+	print 'Chapter not found in sessions ..'
 
 print 'Processing ', chap['name']
 
@@ -56,6 +61,7 @@ session['images'] = image_list
 session['chapter_id'] = chap['_id']
 session['label'] = chap['name']
 session['name'] = chap['name']
+print session
 
 db['sessions'].insert(session)
 
