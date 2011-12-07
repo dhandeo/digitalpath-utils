@@ -154,7 +154,7 @@ def checkRequiredFields(obj, requiredFields, optionalFields, errorStr, extraIsFa
 
 # Helper function - checkObjectId
 def checkObjectId(objId, collName, errorStr):
-    if not pymongo.collection.Collection(database, collName).find({'_id': objId}).count():
+    if not pymongo.collection.Collection(database, collName).find_one({'_id': objId}, {'_id': 1}):
         fatalError(" is a dangling ObjectID")
 
 
