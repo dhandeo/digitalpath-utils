@@ -3,6 +3,7 @@
 
 import sys, pymongo
 import re, StringIO, wx
+from bson import Binary
 
 DISPLAY = False
 UPLOAD = True
@@ -17,6 +18,8 @@ def doWork(database):
             imgDataColl = pymongo.collection.Collection(database, dbName)
             if not imgDataColl.find_one({'name': 'thumb.jpg'}, {'_id': 1}):
                 imgDoc = imgDataColl.find_one({'name': 't.jpg'})
+                print 'Processing for ', dbName
+                
                 baseImg = imgDoc['file']
                 wxImgRaw = wx.ImageFromStream(StringIO.StringIO(str(baseImg)), type = wx.BITMAP_TYPE_JPEG)
                 wxImgCrop = AutoCropWhiteSpace(wxImgRaw, 245)
@@ -70,7 +73,7 @@ def doWork(database):
                               'xe': imgDoc['xe'],
                               'ys': imgDoc['ys'],
                               'ye': imgDoc['ye'],
-                              'file': pymongo.binary.Binary(outputStream.getvalue()) # change to use BSON.binary
+                              'file':  Binary(outputStream.getvalue()) # change to use BSON.binary
                              }
                     imgDataColl.insert(newDoc, safe = True)
 
