@@ -10,8 +10,8 @@ debug = False
 #want command line argument
 if len(sys.argv) < 3:
 	print 'Error: Missing arguments\n' 
-	print 'Usage:  python ' + sys.argv[0] + ' mongo_instance database'
-	print '    e.g python ' + sys.argv[0] + ' amber11:27017 daniels128'
+	print 'Usage:  python ' + sys.argv[0] + ' mongo_instance database chapter_name'
+	print '    e.g python ' + sys.argv[0] + ' amber11:27017 daniels128 session13'
 	sys.exit(0)
 
 # Get command line arguments 
@@ -48,11 +48,12 @@ print 'Processing ', chap['name']
 images = db['images'].find({'title':chap['_id']})
 
 image_list = []
-
+count = 0
 for animage in images:
 	print '    Processing ', animage['name']
 	# add the image to 
-	image_list.append(animage['_id'])
+	image_list.append({'ref': animage['_id'], 'pos': count})
+	count = count + 1
 	# update the image record to remove chapter id
 
 # Create a record in sessions 
@@ -61,7 +62,10 @@ session['images'] = image_list
 session['chapter_id'] = chap['_id']
 session['label'] = chap['name']
 session['name'] = chap['name']
+
+# Now have session
 print session
+
 
 db['sessions'].insert(session)
 
