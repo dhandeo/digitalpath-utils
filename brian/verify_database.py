@@ -1,5 +1,6 @@
 import sys, re
 import pymongo
+import bson
 
 
 ## Check regular collection
@@ -109,7 +110,7 @@ def checkOrderedRefListField(obj, fieldName, errorStr, refCollection):
         seenPosSet.add(orderedRefElem['pos'])
         # 'ref'
         elemFieldErrorStr = elemErrorStr + ": '%s' field" % ('ref')
-        checkType(orderedRefElem['ref'], pymongo.objectid.ObjectId, "ObjectID", elemFieldErrorStr)
+        checkType(orderedRefElem['ref'], bson.objectid.ObjectId, "ObjectID", elemFieldErrorStr)
         checkObjectId(orderedRefElem['ref'], refCollection, elemFieldErrorStr)
         # 'label' - optional
         if 'label' in orderedRefElem.keys():
@@ -155,7 +156,7 @@ def checkRequiredFields(obj, requiredFields, optionalFields, errorStr, extraIsFa
 # Helper function - checkObjectId
 def checkObjectId(objId, collName, errorStr):
     if not pymongo.collection.Collection(database, collName).find_one({'_id': objId}, {'_id': 1}):
-        fatalError(" is a dangling ObjectID")
+        fatalError(errorStr + " is a dangling ObjectID: '%s'" % (str(objId)))
 
 
 # Helper function - isValidString
@@ -166,7 +167,7 @@ def isValidString(testString):
         return " contains newline character"
     if testString != testString.strip(' \t'):
         return " contains leading/trailing whitespace"
-    if not re.match('^[A-Z0-9_ .-]*$', testString, re.IGNORECASE):
+    if not re.match('^[A-Z0-9_ ./()-]*$', testString, re.IGNORECASE):
         return " contains non-alphanumeric character"
     return ""
 

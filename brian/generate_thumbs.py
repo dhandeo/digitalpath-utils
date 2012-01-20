@@ -1,9 +1,8 @@
 
 # Template for database util
 
-import sys, pymongo
+import sys, pymongo, bson
 import re, StringIO, wx
-from bson import Binary
 
 DISPLAY = False
 UPLOAD = True
@@ -19,7 +18,9 @@ def doWork(database):
             if not imgDataColl.find_one({'name': 'thumb.jpg'}, {'_id': 1}):
                 imgDoc = imgDataColl.find_one({'name': 't.jpg'})
                 print 'Processing for ', dbName
-                
+                if not imgDoc:
+                    print "Error: session \"%s\" does not contain 't.jpg' document" % dbName
+                    continue
                 baseImg = imgDoc['file']
                 wxImgRaw = wx.ImageFromStream(StringIO.StringIO(str(baseImg)), type = wx.BITMAP_TYPE_JPEG)
                 wxImgCrop = AutoCropWhiteSpace(wxImgRaw, 245)
@@ -36,6 +37,8 @@ def doWork(database):
                     newPosY = (256 - newHeight) / 2
                 wxImgCrop.Rescale(newWidth, newHeight, wx.IMAGE_QUALITY_HIGH)
                 wxImgFinal = wxImgCrop.Size((256, 256), (newPosX, newPosY), 255, 255, 255)
+
+                print "Thumbnail generated for \"%s\"" % pymongo.collection.Collection(database, 'images').find_one({'_id': bson.objectid.ObjectId(dbName)}, {'name': 1})['name']
 
                 if DISPLAY:
                     wxBmpRaw = wx.BitmapFromImage(wxImgRaw)
@@ -73,9 +76,10 @@ def doWork(database):
                               'xe': imgDoc['xe'],
                               'ys': imgDoc['ys'],
                               'ye': imgDoc['ye'],
-                              'file':  Binary(outputStream.getvalue()) # change to use BSON.binary
+                              'file': bson.binary.Binary(outputStream.getvalue())
                              }
                     imgDataColl.insert(newDoc, safe = True)
+                    print "  uploaded"
 
 
 
@@ -144,14 +148,14 @@ try:
     connTimeout = 10
     connection = pymongo.connection.Connection(argHostname, argHostport, network_timeout = connTimeout)
     if argDBName not in connection.database_names():
-        fatalError("Error: database \"%s\" not found on server" % (argDBName))
+        print "Error: database \"%s\" not found on server" % (argDBName)
     try:
         database = pymongo.database.Database(connection, argDBName)
         doWork(database)
     except pymongo.errors.InvalidName as e:
-        fatalError("Error: database name \"%s\" is not valid: %s" %(argDBName, e.message))
+        print "Error: database name \"%s\" is not valid: %s" %(argDBName, e.message)
 except pymongo.errors.AutoReconnect as e:
-    fatalError("Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport))
+    print "Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport)
     exit(1)
 
 

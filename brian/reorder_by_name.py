@@ -4,9 +4,20 @@
 import sys, pymongo
 
 def doWork(database):
-    # work here    
-    coll = pymongo.collection.Collection(database, '')
+    sessColl = pymongo.collection.Collection(database, 'sessions')
 
+    # ordered list must be created
+    for sessDoc in sessColl.find():
+		newImageList = dict()
+		for imgElem in sessDoc['images']:
+			 imgElemName = pymongo.collection.Collection(database, 'images').find_one({'_id': imgElem['ref']})['name']
+			 newImageList[imgElemName] = imgElem
+		for (count, imgElemName) in enumerate(sorted(newImageList.keys())):
+			newImageList[imgElemName]['pos'] = count
+			sessColl.update( {'_id': sessDoc['_id']}, {'$push': {'images_new': newImageList[imgElemName]}} )
+        #sessColl.update( {'_id': sessDoc['_id']}, {'$unset': {'images': 1}} )
+        #sessColl.update( {'_id': sessDoc['_id']}, {'$rename': {'images_new': 'images'}} )
+    print "db.sessions.images reordered by name"
 
 
 
@@ -23,13 +34,11 @@ try:
     connection = pymongo.connection.Connection(argHostname, argHostport, network_timeout = connTimeout)
     if argDBName not in connection.database_names():
         print "Error: database \"%s\" not found on server" % (argDBName)
-        exit(1)
     try:
         database = pymongo.database.Database(connection, argDBName)
-        doWork(database)            
+        doWork(database)
     except pymongo.errors.InvalidName as e:
         print "Error: database name \"%s\" is not valid: %s" %(argDBName, e.message)
-        exit(1)
 except pymongo.errors.AutoReconnect as e:
     print "Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport)
     exit(1)

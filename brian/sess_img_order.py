@@ -6,31 +6,36 @@ import sys, pymongo
 def doWork(database):
     sessColl = pymongo.collection.Collection(database, 'sessions')
 
-    # determine if lists need to be converted
-    sampleImgElem = sessColl.find()[0]['images'][0]
+    for sessDoc in sessColl.find():
+        # determine if lists need to be converted
+        sampleImgElem = sessDoc['images'][0]
 
-    # ordered list must be created
-    if not isinstance(sampleImgElem, dict):
-        for sessDoc in sessColl.find():
+        # ordered list must be created
+        if not isinstance(sampleImgElem, dict):
+            print "Session %s : \"%s\" to be converted to ordered 'images' list" % (sessDoc['_id'], sessDoc['name'])
+            print "  dumping old session document:"
+            print sessDoc, "\n"
+            newImageList = list()
             for (count, imgElem) in enumerate(sessDoc['images']):
-                new_item = {'ref': imgElem, 'pos': count}
-                sessColl.update( {'_id': sessDoc['_id']}, {'$push': {'images_new': new_item}} )
-            sessColl.update( {'_id': sessDoc['_id']}, {'$unset': {'images': 1}} )
-            sessColl.update( {'_id': sessDoc['_id']}, {'$rename': {'images_new': 'images'}} )
-        print "db.sessions.images updated to ordered ref list"
+                newImageList.append( {'ref': imgElem, 'pos': count} )
+            sessColl.update( {'_id': sessDoc['_id']}, {'$set': {'images': newImageList}} )
+            print "  dumping new session document:"
+            print sessColl.find_one({'_id': sessDoc['_id']}), "\n"
 
-    # ordered list elements must be renamed 'img' -> 'ref'
-    elif 'img' in sampleImgElem.keys():
-        for sessDoc in sessColl.find():
+        # ordered list elements must be renamed 'img' -> 'ref'
+        elif 'img' in sampleImgElem.keys():
+            print "Session %s : \"%s\" 'images' list to be renamed 'img' -> 'ref'" % (sessDoc['_id'], sessDoc['name'])
+            print "  dumping old session document:"
+            print sessDoc, "\n"
+            newImageList = list()
             for imgElem in sessDoc['images']:
-                new_item = {'ref': imgElem['img'], 'pos': imgElem['pos']}
-                sessColl.update( {'_id': sessDoc['_id']}, {'$push': {'images_new': new_item}} )
-            sessColl.update( {'_id': sessDoc['_id']}, {'$unset': {'images': 1}} )
-            sessColl.update( {'_id': sessDoc['_id']}, {'$rename': {'images_new': 'images'}} )
-        print "db.sessions.images updated: elements renamed 'img' -> 'ref'"\
+                newImageList.append( {'ref': imgElem['img'], 'pos': imgElem['pos']} )
+            sessColl.update( {'_id': sessDoc['_id']}, {'$set': {'images': newImageList}} )
+            print "  dumping new session document:"
+            print sessColl.find_one({'_id': sessDoc['_id']}), "\n"
 
-    else:
-        print "db.sessions.images not updated, already in the proper format"
+        else:
+            print "Session %s : \"%s\" not updated, already in the proper format" % (sessDoc['_id'], sessDoc['name'])
 
 
 # Main boilerplate
@@ -44,14 +49,14 @@ try:
     connTimeout = 10
     connection = pymongo.connection.Connection(argHostname, argHostport, network_timeout = connTimeout)
     if argDBName not in connection.database_names():
-        fatalError("Error: database \"%s\" not found on server" % (argDBName))
+        print "Error: database \"%s\" not found on server" % (argDBName)
     try:
         database = pymongo.database.Database(connection, argDBName)
-        doWork(database)            
+        doWork(database)
     except pymongo.errors.InvalidName as e:
-        fatalError("Error: database name \"%s\" is not valid: %s" %(argDBName, e.message))
+        print "Error: database name \"%s\" is not valid: %s" %(argDBName, e.message)
 except pymongo.errors.AutoReconnect as e:
-    fatalError("Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport))
+    print "Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport)
     exit(1)
 
 
