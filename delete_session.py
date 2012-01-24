@@ -1,5 +1,6 @@
 """
-	Used to manually delete chapters and all associated images.
+	Used to manually delete session and all associated images
+	Risky
 	This pseudo code will be later used to write php function
 """
 import pymongo
