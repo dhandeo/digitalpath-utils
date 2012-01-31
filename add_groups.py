@@ -25,7 +25,7 @@ def session_in_group(mongodb, cmd, facebook_id, which):
 	print "    ", cmd, facebook_id, which
 	if cmd == "add":
 		# Update the can_see
-		pass 	
+		mongodb["groups"].update({"facebook_id" : facebook_id}, {"$addToSet" : {"can_see" : which}})
 
 	elif cmd == "del":
 		pass
@@ -57,19 +57,20 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all):
 		sessions_list.append((session['_id'], session['name']))
 		count = count + 1
 	print "Done "
-	print sessions_list
+	for ases in sessions_list:
+		print ases
 
 	if which_all == "all":
 		# For all sessions call add_session_to_group
 		print "  ", cmd, facebook_id, "all"
 		for asession in sessions_list:
-			session_in_group(mongodb, cmd, facebook_id, asession)
+			print "Adding"
+			session_in_group(mongodb, cmd, facebook_id, asession[0])
 
 	if which_all < 0:
 		print "  ", cmd, facebook_id, "Adding sorted"
 		for asession in sessions_list[which_all:]:
-			session_in_group(mongodb, cmd, facebook_id, asession)
-
+			session_in_group(mongodb, cmd, facebook_id, asession[0])
 
 		
 def manually_add_groups(conn, database):
@@ -82,17 +83,15 @@ def manually_add_groups(conn, database):
 	add_group(mongodb, '302644506427080','Dermatology Residents UNM', "bev1")
 	add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training Program',"bev1")
 
-	add_group(mongodb, '320347061312744','Histology WUSM', "paul3") 
+	add_group(mongodb, '320347061312744','Histology WUSM', "paul2") 
 	
 	# Adding sessions one by one 
 
-	sessions_in_group(mongodb, "add", '365400966808177', -1)
-	sessions_in_group(mongodb, "add", '302644506427080', -1)
-	sessions_in_group(mongodb, "add", '231408953605826', -1)
+	sessions_in_group(mongodb, "add", '365400966808177', -2)
+	sessions_in_group(mongodb, "add", '302644506427080', -2)
+	sessions_in_group(mongodb, "add", '231408953605826', -2)
                              
 	sessions_in_group(mongodb, "add", '320347061312744', "all")
-
-
 
 # Mangually updated facebook groups and corresponding databases etc
 if __name__ == '__main__':
@@ -108,7 +107,6 @@ if __name__ == '__main__':
 	# Cleanup if force parameter specified
 	try:	
 		force = int(sys.argv[3]) 
-
 	except:
 		force = 0
 
@@ -117,7 +115,7 @@ if __name__ == '__main__':
 
 	if force:
 		print "Trying to drop groups collection ..", 
-		conn['database'].drop_collection('groups')
+		conn[database].drop_collection('groups')
 
 	manually_add_groups(conn, database)
 	sys.exit(0)
