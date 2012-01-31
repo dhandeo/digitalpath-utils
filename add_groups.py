@@ -1,3 +1,9 @@
+
+# Follow from main but example usage
+# python add_groups.py localhost slideatlas
+
+
+
 import pymongo
 import sys
 
