@@ -23,10 +23,11 @@ if __name__ == '__main__':
 	col_sessions = db['sessions']
 	col_groups = db['groups']
 
-	groups = [('231677260223624','Massachusetts General Hospital'), 
-			('320347061312744','BIDMC'), 
-			('302644506427080','New Mexico')] 
-
+	groups = [('365400966808177','Pathology Residents and Fellows BIDMC'), 
+			('320347061312744','Histology WUSM'), 
+			('302644506427080','Dermatology Residents UNM'),
+			('231408953605826', 'Combined Dermatology Residency Training Program')]
+			
 	# Create a list of sessions (All by default)
 	sessions = col_sessions.find()
 	sessions_list = []
