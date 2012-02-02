@@ -1,8 +1,6 @@
 
 # Follow from main but example usage
 # python add_groups.py localhost slideatlas
-
-
 import pymongo
 import sys
 
@@ -30,7 +28,9 @@ def session_in_group(mongodb, cmd, facebook_id, which):
 	print "    ", cmd, facebook_id, which
 	if cmd == "add":
 		# Update the can_see
-		mongodb["groups"].update({"facebook_id" : facebook_id}, {"$addToSet" : {"can_see" : which}})
+		err = 	mongodb["groups"].update({"facebook_id" : facebook_id}, {"$addToSet" : {"can_see" : which}})
+		if err <> None:
+			print "Error .."
 
 	elif cmd == "del":
 		pass
@@ -45,8 +45,18 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all):
 	else:
 		print "No group found"
 		return
+	dbase = mongodb['databases'].find_one({'_id' : agroup['db']})
 
-	db = conn[agroup['db']]
+	if dbase == None:
+		# We tried to add to a database which is not registered. Die
+		print "Database registration record not found"
+		sys.exit(0)
+ 
+	#Connect to the registered 	
+	conn2 = pymongo.Connection(dbase['host'])
+	
+	# Open the group and get the name of the database 
+	db = conn2[dbase['dbname']] 
 
 	# Gather the sessions  
 	col_sessions = db['sessions']
@@ -67,26 +77,33 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all):
 
 	if which_all == "all":
 		# For all sessions call add_session_to_group
-		print "  ", cmd, facebook_id, "all"
+		print "Adding all sessions  ", cmd, facebook_id, "all"
 		for asession in sessions_list:
 			print "Adding"
 			session_in_group(mongodb, cmd, facebook_id, asession[0])
 
-	elif int(which_all) == 0:
-		# most likely it is a string
-		print 'Adding a particular session :', which_all
-		# Create a list of sessions (All by default)
-		asession = col_sessions.find_one({"name" : which_all})
-		if asession <> None:
-			session_in_group(mongodb, cmd, facebook_id, asession[0])
+	else:
+		isnumber = False 
+		try:
+			val = int(which_all)
+			isnumber = True
+		except:
+			# most likely it is a string
+			isnumber = False
+
+		if not isnumber:
+			print 'Adding a particular session :', which_all
+			# Create a list of sessions (All by default)
+			asession = col_sessions.find_one({"name" : which_all})
+			if asession <> None:
+				session_in_group(mongodb, cmd, facebook_id, asession['_id'])
+			else:
+				print "Not found"
 		else:
-			print "Not found"
-
-	elif which_all < 0:
-		print "  ", cmd, facebook_id, "Adding sorted"
-		for asession in sessions_list[which_all:]:
-			session_in_group(mongodb, cmd, facebook_id, asession[0])
-
+			if which_all < 0:
+				print "  ", cmd, facebook_id, "Adding sorted"
+				for asession in sessions_list[which_all:]:
+					session_in_group(mongodb, cmd, facebook_id, asession[0])
 		
 def manually_add_groups(conn, database):
 	# Calls the add group function for different facebook groups 
@@ -185,9 +202,3 @@ if __name__ == '__main__':
 
 		# Update database record 
 		col_groups.insert(group_obj)
-
-sys.exit(0)
-
- 
-
-
