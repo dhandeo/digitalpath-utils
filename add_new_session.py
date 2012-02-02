@@ -17,7 +17,6 @@ if len(sys.argv) < 3:
 # Get command line arguments 
 mongo = sys.argv[1]
 database = sys.argv[2]
-chapter = sys.argv[3]
 
 # connect with the database
 try:
@@ -29,45 +28,46 @@ except:
 	sys.exit(0)
 
 # Read chapters in the "chapters" collection and gather information about them
-chap = db['chapters'].find_one({'name':chapter})
 
-if chap == None:
-	print 'Chapter not found'
-	sys.exit(0)
+chaps = db['chapters'].find()
 
-asession = db['sessions'].find_one({'chapter_id' : chap['_id']})
-if asession <> None:
-	print 'Found ', asession['name']
-	print 'Removing ..'
-	db['sessions'].remove({'_id':asession['_id']})
-else:
-	print 'Chapter not found in sessions ..'
+for chap in chaps:
+	if chap == None:
+		print 'Chapter not found'
+		sys.exit(0)
 
-print 'Processing ', chap['name']
+	asession = db['sessions'].find_one({'chapter_id' : chap['_id']})
+	if asession <> None:
+		print 'Found ', asession['name']
+		print 'Removing ..'
+		db['sessions'].remove({'_id':asession['_id']})
+	else:
+		print 'Chapter not found in sessions ..'
 
-images = db['images'].find({'title':chap['_id']})
+	print 'Processing ', chap['name']
 
-image_list = []
-count = 0
-for animage in images:
-	print '    Processing ', animage['name']
-	# add the image to 
-	image_list.append({'ref': animage['_id'], 'pos': count})
-	count = count + 1
-	# update the image record to remove chapter id
+	images = db['images'].find({'title':chap['_id']})
 
-# Create a record in sessions 
-session = {}
-session['images'] = image_list
-session['chapter_id'] = chap['_id']
-session['label'] = chap['name']
-session['name'] = chap['name']
+	image_list = []
+	count = 0
+	for animage in images:
+		print '    Processing ', animage['name']
+		# add the image to 
+		image_list.append({'ref': animage['_id'], 'pos': count})
+		count = count + 1
+		# update the image record to remove chapter id
 
-# Now have session
-print session
+	# Create a record in sessions 
+	session = {}
+	session['images'] = image_list
+	session['chapter_id'] = chap['_id']
+	session['label'] = chap['name']
+	session['name'] = chap['name']
 
+	# Now have session
+	print session
 
-db['sessions'].insert(session)
+	db['sessions'].insert(session)
 
 # db.images.update( {}, {$unset: {'title': 1} } )
 # db.sessions.update( {}, {$unset: {'chapter_id': 1} } )

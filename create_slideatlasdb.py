@@ -7,8 +7,8 @@ from add_groups import add_group, sessions_in_group
 print "Reached here 1"
 # This will probably be called only for custom execution so no explicit main function. In fact this calls routines from add_database and add_groups
 
-server_name = "127.0.0.1";
-#server_name = "140.247.106.97";
+#server_name = "127.0.0.1";
+server_name = "140.247.106.97";
 database_name = "slideatlas"
 
 # Open the database
@@ -33,12 +33,12 @@ add_group(mongodb, '302644506427080','Dermatology Residents UNM',  db_obj)
 add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training Program',db_obj)
 
 
-sessions_in_group(mongodb, "add", '365400966808177', "Lecture 1")
-sessions_in_group(mongodb, "add", '302644506427080', "delete")
+sessions_in_group(mongodb, "add", '365400966808177', "Session12")
+sessions_in_group(mongodb, "add", '302644506427080', "Session10")
 #
 ## Combined Derm Residents get access to both
-sessions_in_group(mongodb, "add", '231408953605826', "Lecture 1")
-sessions_in_group(mongodb, "add", '231408953605826', "delete")
+sessions_in_group(mongodb, "add", '231408953605826', "Session12")
+sessions_in_group(mongodb, "add", '231408953605826', "Session10")
 
 #sessions_in_group(mongodb, "add", '365400966808177', "Session18")
 #sessions_in_group(mongodb, "add", '302644506427080', "Review1")
@@ -48,15 +48,13 @@ sessions_in_group(mongodb, "add", '231408953605826', "delete")
 #sessions_in_group(mongodb, "add", '231408953605826', "Session18")
 
 # Add PAUL 
-db_obj = add_database(mongodb, server_name, "paul2", 'Washington University School of Medicine', 'Copyright &copy 2011, Paul Bridgman. All rights reserved', 'showme', 'MOmanage')
+db_obj = add_database(mongodb, server_name, "paul3", 'Washington University School of Medicine', 'Copyright &copy 2011, Paul Bridgman. All rights reserved', 'showme', 'MOmanage')
 
 add_group(mongodb, '320347061312744','Histology WUSM', db_obj) 
 
 sessions_in_group(mongodb, "add", '320347061312744', "all")
 
 # Add DEMO 
-
-add_database(mongodb, server_name, "demo", 'Atlas Demonstration (No password)', 'Copyright &copy 2011, All rights reserved', '', '')
-
-print "Done .."
+#add_database(mongodb, server_name, "demo", 'Atlas Demonstration (No password)', 'Copyright &copy 2011, All rights reserved', '', '')
+#print "Done .."
 
