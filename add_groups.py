@@ -3,7 +3,6 @@
 # python add_groups.py localhost slideatlas
 
 
-
 import pymongo
 import sys
 
@@ -73,7 +72,17 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all):
 			print "Adding"
 			session_in_group(mongodb, cmd, facebook_id, asession[0])
 
-	if which_all < 0:
+	elif int(which_all) == 0:
+		# most likely it is a string
+		print 'Adding a particular session :', which_all
+		# Create a list of sessions (All by default)
+		asession = col_sessions.find_one({"name" : which_all})
+		if asession <> None:
+			session_in_group(mongodb, cmd, facebook_id, asession[0])
+		else:
+			print "Not found"
+
+	elif which_all < 0:
 		print "  ", cmd, facebook_id, "Adding sorted"
 		for asession in sessions_list[which_all:]:
 			session_in_group(mongodb, cmd, facebook_id, asession[0])
