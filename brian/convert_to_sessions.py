@@ -47,7 +47,7 @@ def doWork(database):
                 newImageList.append( {'ref': imgDoc['_id'], 'pos': newPos} )
                 #sessColl.update( {'_id': oldSessDocs[0]['_id']}, {'$set': {'images': newImageList}} )
                 print "  dumping new session document:"
-                print newImageList
+#                print newImageList
                 print " ", sessColl.find_one({'_id': oldSessDocs[0]['_id']})
             else:
                 print "  ERROR: multiple sessions with 'name' \"%s\"; will not add image to a session" % chapterDoc['name']
