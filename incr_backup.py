@@ -12,9 +12,19 @@ debug = False
 #want command line argument
 if len(sys.argv) < 3:
 	print 'Error: Missing arguments\n' 
-	print 'Usage:  python ' + sys.argv[0] + ' mongo_instance database'
-	print '    e.g python ' + sys.argv[0] + ' amber11:27017 daniels128'
+	print 'Usage:  python ' + sys.argv[0] + ' mongo_instance database [only_meta]'
+	print '    e.g to backup only metadata -  python ' + sys.argv[0] + ' amber11:27017 daniels128 1'
 	sys.exit(0)
+
+only_meta = False
+
+try:
+	if int(sys.argv[3]) == 1:
+		only_meta = True
+		print 'Running backup for only metadata'
+except:
+	pass
+
 
 # Get command line arguments 
 mongo = sys.argv[1]
@@ -44,8 +54,11 @@ for acol in cols:
 		if os.path.exists(acol+".bson"):
 			print "Already exists"
 			backup = False
-		else :
-			backup = True
+		else:
+			if not only_meta:
+				backup = True
+			else:
+				backup = False
 
 	if backup:
 		print " ",
