@@ -36,10 +36,12 @@ add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training P
 
 #sessions_in_group(mongodb, "add", '365400966808177', "Session12")
 sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 1")
+sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 2")
 #
 ## Combined Derm Residents get access to both
 sessions_in_group(mongodb, "add", '231408953605826', "Session18")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 1")
+sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 2")
 
 #sessions_in_group(mongodb, "add", '365400966808177', "Session18")
 #sessions_in_group(mongodb, "add", '302644506427080', "Review1")
