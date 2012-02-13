@@ -41,6 +41,25 @@ def image_in_session(mongodb, cmd, session_key, image_key, force=False):
 	if cmd == "add":
 		# Update the can_see
 		print "Adding .."
+		images = session['images']
+
+		max = 0		
+		for animage in images:
+			#print animage
+			if animage['pos'] > max:
+				max = animage['pos']
+
+		new_image = {}
+		new_image[u'ref'] = image['_id']
+		new_image[u'pos'] = max + 1 
+		new_image[u'hide'] = False
+
+		images.append(new_image)
+		mongodb['sessions'].update({'_id': session['_id']}, {'$set':{'images': images}})
+
+		for a in images:
+			print a
+		
 		pass
 	
 	elif cmd == "del":
