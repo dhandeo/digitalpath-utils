@@ -5,28 +5,7 @@ import pymongo
 import sys
 import bson.objectid as oid 
 
-def get_object_in_collection(col, key):
-
-	# Find if the key is id
-	obj = None
-	try:
-		obj = col.find_one({'_id' : oid.ObjectId(key)})
-		if obj <> None:
-			return obj
-	except:
-		print "Error "
-		pass
-	
-	# else check in the 
-	obj = col.find_one({'name':key})
-
-	if obj <> None:
-		return obj
-	
-	# Return None or return false
-	else:
-		return None
-
+from common import get_object_in_collection
 
 def image_in_session(mongodb, cmd, session_key, image_key, force=False):
 
@@ -83,7 +62,11 @@ def image_in_session(mongodb, cmd, session_key, image_key, force=False):
 			
 		print images
 		mongodb['sessions'].update({'_id': session['_id']}, {'$set':{'images': images}})
-			
+
+def copy_image(from_mongodb, from_image, from_session)
+	pass
+
+
 # Main to accept command line and do the operation on images. 
 if __name__ == '__main__':
 	# get the command line arguments
