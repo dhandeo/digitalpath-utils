@@ -34,21 +34,18 @@ add_group(mongodb, '302644506427080','Dermatology Residents UNM',  db_obj)
 add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training Program',db_obj)
 
 
-#sessions_in_group(mongodb, "add", '365400966808177', "Session12")
+# UNM
 sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 1")
 sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 2")
-#
-## Combined Derm Residents get access to both
+
+# Combined Derm Residents get access to both
 sessions_in_group(mongodb, "add", '231408953605826', "Session18")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 1")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 2")
 
-#sessions_in_group(mongodb, "add", '365400966808177', "Session18")
-#sessions_in_group(mongodb, "add", '302644506427080', "Review1")
-#
-## Combined Derm Residents get access to both
-#sessions_in_group(mongodb, "add", '231408953605826', "Review1")
-#sessions_in_group(mongodb, "add", '231408953605826', "Session18")
+# Path residents 
+sessions_in_group(mongodb, "add", '365400966808177', "Slide Review 1")
+sessions_in_group(mongodb, "add", '365400966808177', "Slide Review 2")
 
 # Add PAUL 
 db_obj = add_database(mongodb, server_name, "paul3", 'Washington University School of Medicine', 'Copyright &copy 2011, Paul Bridgman. All rights reserved', 'showme', 'MOmanage')
