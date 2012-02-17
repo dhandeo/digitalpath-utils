@@ -1,11 +1,13 @@
-
 # Follow from main but example usage
 # python add_groups.py localhost slideatlas
+
+# adds or delets images from sessions 
+# The image must already exist
+
 import pymongo
 import sys
 import bson.objectid as oid 
-
-from common import get_object_in_collection
+from common_utils import get_object_in_collection
 
 def image_in_session(mongodb, cmd, session_key, image_key, force=False):
 
@@ -63,7 +65,7 @@ def image_in_session(mongodb, cmd, session_key, image_key, force=False):
 		print images
 		mongodb['sessions'].update({'_id': session['_id']}, {'$set':{'images': images}})
 
-def copy_image(from_mongodb, from_image, from_session)
+def copy_image(from_mongodb, from_image, from_session):
 	pass
 
 
