@@ -6,11 +6,33 @@ import bson.objectid as oid
 
 from common_utils import get_object_in_collection
 
-def sync_session(from_mongodb, to_mongodb, from_session):
+def sync_session(from_mongodb, to_mongodb, session_key):
 	""" Essentially intelligently copies a session from one place to another.
 	"""
 	
-	print from_mongodb, to_mongodb, from_session
+	# Get the session and process each images
+	session_from = get_object_in_collection(from_mongodb['sessions'], session_key)
+	session_to  = get_object_in_collection(to_mongodb['sessions'], session_key)
+	
+	if session_from == None:
+		print 'Source session not found'
+		return
+
+	if session_to == None:
+		print 'No session found in destination'
+		print 'inserting ..'
+
+		# insert an empty session
+		session_to_empty = {}
+		session_to_empty['_id'] = session_from['_id']
+		session_to_empty['name'] = session_from['name']
+		session_to_empty['label'] = session_from['label']
+
+		to_mongodb['sessions'].insert(session_to_empty)
+		session_to  = get_object_in_collection(to_mongodb['sessions'], session_key)
+		print ' Now - ', session_to
+
+	# Find if the session exists in the 
 	pass
 
 
@@ -21,8 +43,6 @@ if __name__ == '__main__':
 		print 'incorrect usage' 
 		print 'correct use: python sessions.py serverfrom databasefrom sessionfrom [server2]' 
 		sys.exit(0)
-
-	print sys.argv
 
 	serverfrom   = sys.argv[1]
 	databasefrom = sys.argv[2]
@@ -51,9 +71,9 @@ if __name__ == '__main__':
 		connto = pymongo.Connection(serverto); 
 		mongodbto = connto[databasefrom]
 	else:
-		mongodbto = conn[databasefrom]
-		connto = mongodbto.connection 
-	
+		connto = pymongo.Connection()
+		mongodbto = connto[databasefrom]
+
 	#except:
 	#	print "Error opening ", databasefrom, " at ", serverto
 	#	sys.exit(0)
