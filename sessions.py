@@ -6,14 +6,15 @@ import bson.objectid as oid
 import argparse
 
 from common_utils import get_object_in_collection
+from collection_utils import copy_collection
 
-def sync_session(from_mongodb, to_mongodb, session_key, debug=False):
+def sync_session(from_mongodb, to_mongodb, session_key, args = {}):
 	""" Essentially intelligently copies a session from one place to another.
 	"""
 	
 	# Get the session and process each images
-	session_from = get_object_in_collection(from_mongodb['sessions'], session_key, debug)
-	session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,debug)
+	session_from = get_object_in_collection(from_mongodb['sessions'], session_key, args['debug'])
+	session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
 	
 	if session_from == None:
 		print 'Source session not found'
@@ -30,8 +31,12 @@ def sync_session(from_mongodb, to_mongodb, session_key, debug=False):
 		session_to_empty['label'] = session_from['label']
 		session_to_empty['images'] = []
 
-		to_mongodb['sessions'].insert(session_to_empty)
-		session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,debug)
+		if not args['dry']:
+			to_mongodb['sessions'].insert(session_to_empty)
+			session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
+		else:
+			print 'need to insert empty collection to continue - ', session_to_empty
+			sys.exit(0)
 
 	# at this point both sessions should have objects 
 	count = 0
@@ -51,7 +56,14 @@ def sync_session(from_mongodb, to_mongodb, session_key, debug=False):
 			ref_exist = 'REF'
 		else:
 			ref_exit = 'NOT'
-		
+			# dump and restore the image collection
+			# Find all objects and 
+			print 'Starting to copy ', str(id_str)	
+			
+			for obj in from_mongodb[str(id_str)].find():
+				to_mongodb[str(id_str)].insert(obj)
+	
+	
 		# Synchronize actual image data  
 		id_str = animage['ref']
 
@@ -61,7 +73,7 @@ def sync_session(from_mongodb, to_mongodb, session_key, debug=False):
 			col_exit = 'NOT'
 
 		# Synchronize the record in images collection
-		image_obj = get_object_in_collection(to_mongodb['images'], animage['ref'], debug)
+		image_obj = get_object_in_collection(to_mongodb['images'], animage['ref'], args['debug'])
  
 		if image_obj == None:
 			exists = 'NOT'
@@ -109,6 +121,6 @@ if __name__ == '__main__':
 		print "Error opening ", args.databasefrom, " at ", args.serverto
 		sys.exit(0)
 
-	sync_session(mongodbfrom, mongodbto, args.sessionfrom, debug=args.debug)
+	sync_session(mongodbfrom, mongodbto, args.sessionfrom, args={'debug': args.debug, 'dry' : args.no_op, 'force':args.force })
 
 	sys.exit(0)
