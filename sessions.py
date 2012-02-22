@@ -8,6 +8,14 @@ import argparse
 from common_utils import get_object_in_collection
 from collection_utils import copy_collection
 
+def check_image_in_session(mongodb_to, session_obj, image_id)
+	"""
+	Inspects the health in 3 places
+	Not implemented yet
+	"""	
+	pass	
+
+
 def sync_session(from_mongodb, to_mongodb, session_key, args = {}):
 	""" Essentially intelligently copies a session from one place to another.
 	"""
@@ -53,34 +61,60 @@ def sync_session(from_mongodb, to_mongodb, session_key, args = {}):
 		id_str = str(animage['ref'])
 
 		if id_str in to_col_list:
-			ref_exist = 'REF'
+			ref_exist = 'CNK'
 		else:
-			ref_exit = 'NOT'
-			# dump and restore the image collection
-			# Find all objects and 
 			print 'Starting to copy ', str(id_str)	
-			
-			for obj in from_mongodb[str(id_str)].find():
-				to_mongodb[str(id_str)].insert(obj)
+			if not args['dry']:
+				# insert this image collection
+				copy_collection(from_mongodb, to_mongodb, str(id_str))	
+				ref_exit = 'INS'
+			else:
+				ref_exit = 'NOT'
 	
-	
-		# Synchronize actual image data  
+		# Synchronize image reference in the session
 		id_str = animage['ref']
 
-		if id_str in to_col_list:
-			col_exist = 'COL'
+		if id_str in refs:
+			col_exist = 'REF'
 		else:
-			col_exit = 'NOT'
+			# Insert the reference in the session record
+			
+			# Get and modify image record
+			images = session_to['mages']
+			images.append(animage)
+
+			print 'Inserting reference'
+
+			# Insert it back into target collection if not dry
+			if not args['dry']:
+				# Insert the image record
+				to_mongodb['sessions'].update({'_id': session_to['_id']},{'$set' :{ 'images':images}})
+				to_mongodb['images'].
+				session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
+				image_exists = 'INS'
+			else:
+				image_exists = 'NOT'
+
+			session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
 
 		# Synchronize the record in images collection
 		image_obj = get_object_in_collection(to_mongodb['images'], animage['ref'], args['debug'])
  
 		if image_obj == None:
-			exists = 'NOT'
+			print 'Inserting image record ...'
+			if not args['dry']:
+				# Get the image object 
+				image_obj = get_object_in_collection(from_mongodb['images'], animage['ref'], args['debug'])
+				
+				# Insert the image record
+				to_mongodb['images'].insert(image_obj)
+				image_exists = 'INS'
+			else:
+				image_exists = 'NOT'
 		else :
-			exists = 'IMG'
+			image_exists = 'IMG'
 
-		print animage['ref'], exists, col_exit, ref_exit
+		print animage['ref'], image_exists, col_exit, ref_exit
 
 	# Find if the session exists in the 
 	pass
