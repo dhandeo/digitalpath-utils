@@ -8,7 +8,7 @@ import argparse
 from common_utils import get_object_in_collection
 from collection_utils import copy_collection
 
-def check_image_in_session(mongodb_to, session_obj, image_id)
+def check_image_in_session(mongodb_to, session_obj, image_id):
 	"""
 	Inspects the health in 3 places
 	Not implemented yet
@@ -89,13 +89,15 @@ def sync_session(from_mongodb, to_mongodb, session_key, args = {}):
 			if not args['dry']:
 				# Insert the image record
 				to_mongodb['sessions'].update({'_id': session_to['_id']},{'$set' :{ 'images':images}})
-				to_mongodb['images'].
-				session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
-				image_exists = 'INS'
-			else:
-				image_exists = 'NOT'
+				# to_mongodb['images'].update({'_id':
+
 
 			session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
+			session_to  = get_object_in_collection(to_mongodb['sessions'], session_key,args['debug'])
+			image_exists = 'INS'
+		else:
+			image_exists = 'NOT'
+
 
 		# Synchronize the record in images collection
 		image_obj = get_object_in_collection(to_mongodb['images'], animage['ref'], args['debug'])
