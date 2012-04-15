@@ -39,7 +39,7 @@ sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 1")
 sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 2")
 
 # Combined Derm Residents get access to both
-sessions_in_group(mongodb, "add", '231408953605826', "Session18")
+sessions_in_group(mongodb, "add", '231408953605826', "Session23")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 1")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 2")
 
@@ -56,5 +56,13 @@ sessions_in_group(mongodb, "add", '320347061312744', "all")
 
 # Add DEMO 
 add_database(mongodb, server_name, "demo", 'Atlas Demonstration (No password)', 'Copyright &copy 2011, All rights reserved', '', '')
+
+# Add JEREMY  
+db_obj = add_database(mongodb, server_name, "jnk1", 'WSI Jeremy Kay', 'Copyright &copy 2012, Jeremy Kay. All rights reserved', 'Easter', 'Easter12')
+
+add_group(mongodb, '199923673454359','WSI Jeremy Kay', db_obj) 
+
+sessions_in_group(mongodb, "add", '199923673454359' , "all")
+
 print "Done .."
 
