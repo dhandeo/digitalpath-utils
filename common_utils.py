@@ -24,7 +24,6 @@ def get_object_in_collection(col, key, debug=False):
 	if obj <> None:
 		if debug:
 			print 'Name works',
-		print " "
 		return obj
 	
 	# Return None or return false
@@ -33,3 +32,6 @@ def get_object_in_collection(col, key, debug=False):
 			print "Nothing worked .."
 		return None
 
+def get_session_from_key(db, key, debug=False):
+	pass	
+	

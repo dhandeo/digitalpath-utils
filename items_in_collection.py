@@ -2,14 +2,12 @@ import pymongo
 import bson
 import sys
 
-class ItemsInCollection():
-	def __init__(self, item_type_string, db, root, session_key=None):
+class ItemsInSession():
+	def __init__(self, item_type_string, db, root, session):
+		""" accepts type of object, pymongo db instance, the root string to avoid conflicting names and sessions key """ 
 		self.item_type = item_type_string
 		self.db = db
 		self.root = root
-
-		if not session_key == None:
-			self.SetSession(session_key)
 
 	def SetSession(self, session_key):
 		# Look for the session 
@@ -29,16 +27,18 @@ class ItemsInCollection():
 		pass
 
 
-class Attachments(ItemsInCollection):
-	def __init__(self, db, root):
-		items_in_collection.__init__(self, "attachments")
+class Attachments(ItemsInSession):
+	def __init__(self, db, root, session):
+		ItemsInSession.__init__(self, "file", db, root, session)
 
 	def Insert(self, item):
 		pass
 	
 	def Delete(self, item_key):
+		pass
 		
 	def List(self):
+		pass
  
 
 
