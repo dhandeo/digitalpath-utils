@@ -1,5 +1,6 @@
 from items_in_collection import *
 from common_utils import *
+import os
 
 # Main to accept command line and do the operation on images. 
 if __name__ == '__main__':
@@ -61,15 +62,18 @@ if __name__ == '__main__':
 		try :
 			fin = open(attachment_path,"r+")
 			attachment = fin.read()
-
 		except:
 			print "Cannot open attachment" 
+
+		[head, tail] = os.path.split(attachment_path)
+		ic.Insert(attachment, tail)
+	
 	elif command == "delete":
 		print "Find and delete"
 		pass
 	
 	elif command == "list":
-		print "Listing .."
+		attachments = ic.List()
 	
 	elif 1:
 		print "Unknown command : ", command
