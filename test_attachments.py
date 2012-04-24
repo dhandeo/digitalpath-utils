@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	if attachment_path:
 		print "Attachment path specified"
 	else:
-		if command != "list":
+		if command != "list" and command != "flush":
 			print "Attachment path required"		
 			sys.exit(0)
 
@@ -74,6 +74,12 @@ if __name__ == '__main__':
 	
 	elif command == "list":
 		attachments = ic.List()
+
+	elif command == "flush":
+		resp = raw_input('Are you sure you want to flush ?')
+	
+		if resp == 'y' or resp == 'Y' :
+	 		ic.Flush()
 	
 	elif 1:
 		print "Unknown command : ", command
