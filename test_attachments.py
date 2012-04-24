@@ -42,7 +42,7 @@ if __name__ == '__main__':
 	if attachment_path:
 		print "Attachment path specified"
 	else:
-		if command != "list":
+		if command != "list" and command != "flush":
 			print "Attachment path required"		
 			sys.exit(0)
 
@@ -61,12 +61,12 @@ if __name__ == '__main__':
 	if command == "insert":
 		try :
 			fin = open(attachment_path,"r+")
-			attachment = fin.read()
+			attachdata = fin.read()
 		except:
 			print "Cannot open attachment" 
 
 		[head, tail] = os.path.split(attachment_path)
-		ic.Insert(attachment, tail)
+		ic.Insert(attachdata, tail)
 	
 	elif command == "delete":
 		print "Find and delete"
@@ -74,6 +74,12 @@ if __name__ == '__main__':
 	
 	elif command == "list":
 		attachments = ic.List()
+
+	elif command == "flush":
+		resp = raw_input('Are you sure you want to flush ?')
+	
+		if resp == 'y' or resp == 'Y' :
+	 		ic.Flush()
 	
 	elif 1:
 		print "Unknown command : ", command

@@ -11,7 +11,9 @@ class ItemsInSession():
 		self.root = root
 
 		# create a gridfs session from known information
-		self.gf = gridfs.GridFS(db, root)
+		self.gf = gridfs.GridFS(self.db, self.root)
+
+		print 'Root set at ', root
 
 	def SetSession(self, session_key):
 		# Look for the session 
@@ -41,6 +43,12 @@ class ItemsInSession():
 		# Call mongodb gridfiles to list all the items in the given root
 		print self.gf.list()	
 
+	def Flush(self):
+		# Remove all records
+		print "Removing files .. "
+		self.db[self.root + ".files"].drop()
+		print "Removing chunks .. "
+		self.db[self.root + ".chunks"].drop()
 
 class Attachments(ItemsInSession):
 	def __init__(self, db, root, session):
