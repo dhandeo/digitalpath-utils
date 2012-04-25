@@ -9,6 +9,7 @@ class ItemsInSession():
 		self.item_type = item_type_string
 		self.db = db
 		self.root = root
+		self.session = session
 
 		# create a gridfs session from known information
 		self.gf = gridfs.GridFS(self.db, self.root)
@@ -33,15 +34,24 @@ class ItemsInSession():
 		# Store the id in the grid file system
 		self.gf.put(data,filename=name, _id=newid)
 		# Store the id and metadata in the session
+		
+		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$push' : { 'attachments' : newid } })
 		pass
 
 	def Delete(self, session_key, item):
+		
 		pass
 	
 	def List(self):
-		print 'Base Listing ..'
-		# Call mongodb gridfiles to list all the items in the given root
-		print self.gf.list()	
+		print 'GridFS Listing ..', self.gf.list()	
+
+		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
+
+		try :
+			print 'Session record ..', self.session['attachments']
+		except KeyError:
+			print 'No attachment record in the session'
+		
 
 	def Flush(self):
 		# Remove all records
@@ -49,6 +59,10 @@ class ItemsInSession():
 		self.db[self.root + ".files"].drop()
 		print "Removing chunks .. "
 		self.db[self.root + ".chunks"].drop()
+		
+		# remove attachments field from the session object
+		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {'attachments' :1} })
+
 
 class Attachments(ItemsInSession):
 	def __init__(self, db, root, session):
