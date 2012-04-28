@@ -61,12 +61,12 @@ if __name__ == '__main__':
 	if command == "insert":
 		try :
 			fin = open(attachment_path,"r+")
-			attachment = fin.read()
+			attachdata = fin.read()
 		except:
 			print "Cannot open attachment" 
 
 		[head, tail] = os.path.split(attachment_path)
-		ic.Insert(attachment, tail)
+		ic.Insert(attachdata, tail)
 	
 	elif command == "delete":
 		print "Find and delete"
