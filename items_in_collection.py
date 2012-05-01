@@ -46,17 +46,10 @@ class ItemsInSession(MongoBase):
 		self.db = db
 		self.session = session
 		print 'Root set at ', root
-	
-	
-		pass
 
 	def Insert(self, newid):
 		""" Accepts the data to store"""
 		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$push' : { self.root : newid } })
-		pass
-
-	def Delete(self, session_key, item):
-		
 		pass
 	
 	def List(self):
@@ -77,21 +70,20 @@ class ItemsInSession(MongoBase):
 class Attachments(ItemsInSession, ItemsInGridFS):
 	def __init__(self, db, root, session):
 		""" init subclasses with proper variables """
-		ItemsInGridFS.__init__(self, "file", db)
+		MongoBase.__init__(self, db)
+		self.igfs = ItemsInGridFS("attachments")
 		ItemsInSession.__init__(self, session)
 
 	def Insert(self, data, name):
 		""" Accepts the data to store"""
 		# Put the attachment in the gridfs and 
-		newid =	ItemsInGridFS.Insert(self, data, name)
-		ItemsInSession.Insert(self, newid)
-
-	
+		newid =	ItemsInGridFS.Insert(data, name)
+		ItemsInSession.Insert(newid)
 
 	def Flush(self):
 		# Remove all records
-		ItemsInSession.Flush(self)
 		ItemsInGridFS.Flush(self)
+		ItemsInSession.Flush(self)
 
 	def Insert(self, data, name):
 		# Make sure initialized correctly
