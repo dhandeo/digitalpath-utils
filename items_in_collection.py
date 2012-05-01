@@ -35,6 +35,13 @@ class ItemsInGridFSMixin():
 	def List(self):
 		print self.gf.list()
 
+	def Delete(self, deleteid):
+		self.gf.delete(deleteid)
+
+	def Get(self, getid):
+		out = self.gf.get(getid)
+		return out.read()
+
 class ItemsInSessionMixin():
 	"""
 	Derived classes neeed to take care of the individual storage and then add to the metadata using base class
@@ -49,7 +56,7 @@ class ItemsInSessionMixin():
 		# Get the list 
 
 		objects = ItemsInSessionMixin.List(self)
-		print 'Got list:', objects
+		# print 'Got list:', objects
 
 		max = 0		
 
@@ -63,17 +70,20 @@ class ItemsInSessionMixin():
 		new_object[u'pos'] = max + 1 
 		new_object[u'hide'] = False
 
-		print 'Created', new_object
+		# print 'Created', new_object
 
 		objects.append(new_object)
 		self.db['sessions'].update({'_id': self.session['_id']}, {'$set':{self.item_type: objects}})
 	
 	def List(self):
 		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
-		
 		try :
-			print 'Session record ..', self.session[self.item_type]
-			return  self.session[self.item_type]
+			items =	self.session[self.item_type]
+			print 'Session record:'
+			for anitem in items:
+				print '  ', anitem
+			return items 
+
 		except KeyError:
 			print 'No', self.item_type, 'record in the session'
 			return []
@@ -107,3 +117,29 @@ class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 
 		print "Listing from grid :"
 		ItemsInGridFSMixin.List(self)
+
+	def Delete(self, deleteid):
+		# make sure that the id exists
+
+		# TODO: start here		
+		bson.ObjectId(deleteid)
+
+
+		items = ItemsInSessionMixin.List(self)
+		
+		found = False
+	
+		for anitem in items:
+			if anitem['ref'] == deleteid:
+				found = deleteid
+						
+		if found:
+			print 'Item found ..'
+
+			# Remove from session
+			ItemsInSessionMixin.Delete(self, deleteid)
+
+			# Remove from gridfs
+			ItemsInGridFSMixin.Delete(self, deleteid)
+
+

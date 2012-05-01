@@ -7,7 +7,7 @@ if __name__ == '__main__':
 	# get the command line arguments
 	if len(sys.argv) < 5:
 		print 'incorrect usage' 
-		print 'correct use: python test_attachments.py server database session_key command [path_to_attachment] [force]' 
+		print 'correct use: python test_attachments.py server database session_key command [path_to_attachment] [output_path]' 
 		sys.exit(0)
 
 	server   = sys.argv[1]
@@ -20,12 +20,12 @@ if __name__ == '__main__':
 		attachment_path = sys.argv[5]
 	except:
 		attachment_path = False
-	
-	# Cleanup if force parameter specified
+
+	# Try if output path is specified  
 	try:	
-		force = int(sys.argv[6]) 
+		output_path = sys.argv[6]
 	except:
-		force = 0
+		output_path = False
 
 	try:
 		# Try opening the database	
@@ -34,10 +34,6 @@ if __name__ == '__main__':
 	
 	except:
 		print "Error opening ", database, " at ", server
-	if force:
-		print "Using Force ..", 
-
-	# Try if attachment path is specified
 	
 	if attachment_path:
 		print "Attachment path specified"
@@ -67,10 +63,18 @@ if __name__ == '__main__':
 
 		[head, tail] = os.path.split(attachment_path)
 		ac.Insert(attachdata, tail)
+
+	elif command == 'get':
+		if not output_path:
+			print 'Output path is required'
+			sys.exit(0)
+		else:
+			fout = open(output_path, 'w+')
+			fout.write(ac.Get(attachment_path))
 	
 	elif command == "delete":
+		ac.Delete(attachment_path)
 		print "Find and delete"
-		pass
 	
 	elif command == "list":
 		print ac.List()
