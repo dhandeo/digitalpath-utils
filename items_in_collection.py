@@ -46,15 +46,37 @@ class ItemsInSessionMixin():
 
 	def Insert(self, newid):
 		""" Accepts the data to store"""
-		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$push' : { self.item_type : newid } })
+		# Get the list 
+
+		objects = ItemsInSessionMixin.List(self)
+		print 'Got list:', objects
+
+		max = 0		
+
+		for anobject in objects:
+			# print anobject
+			if anobject['pos'] > max:
+				max = anobject['pos']
+
+		new_object = {}
+		new_object[u'ref'] = newid
+		new_object[u'pos'] = max + 1 
+		new_object[u'hide'] = False
+
+		print 'Created', new_object
+
+		objects.append(new_object)
+		self.db['sessions'].update({'_id': self.session['_id']}, {'$set':{self.item_type: objects}})
 	
 	def List(self):
 		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
-
+		
 		try :
 			print 'Session record ..', self.session[self.item_type]
+			return  self.session[self.item_type]
 		except KeyError:
 			print 'No', self.item_type, 'record in the session'
+			return []
 
 	def Flush(self):
 		# remove attachments field from the session object
