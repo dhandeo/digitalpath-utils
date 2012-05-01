@@ -55,7 +55,7 @@ if __name__ == '__main__':
 		sys.exit(0)
 
 	# Create the object with that mongodb
-	ic = Attachments(mongodb, "attachments",session)
+	ac = Attachments(mongodb,session)
 	
 	# Open the file if insert 
 	if command == "insert":
@@ -66,20 +66,20 @@ if __name__ == '__main__':
 			print "Cannot open attachment" 
 
 		[head, tail] = os.path.split(attachment_path)
-		ic.Insert(attachdata, tail)
+		ac.Insert(attachdata, tail)
 	
 	elif command == "delete":
 		print "Find and delete"
 		pass
 	
 	elif command == "list":
-		attachments = ic.List()
+		print ac.List()
 
 	elif command == "flush":
 		resp = raw_input('Are you sure you want to flush ?')
 	
 		if resp == 'y' or resp == 'Y' :
-	 		ic.Flush()
+	 		ac.Flush()
 	
 	elif 1:
 		print "Unknown command : ", command

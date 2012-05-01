@@ -7,7 +7,7 @@ class MongoApp():
 	"""
 	In future also manage the secure connection etc
 	"""	
-	def __init__(db):
+	def __init__(self,db):
 		self.db = db
 
 class ItemsInGridFSMixin():
@@ -31,6 +31,9 @@ class ItemsInGridFSMixin():
 		# Store the id in the grid file system
 		self.gf.put(data,filename=name, _id=newid)
 		return newid
+
+	def List(self):
+		print self.gf.list()
 
 class ItemsInSessionMixin():
 	"""
@@ -57,7 +60,7 @@ class ItemsInSessionMixin():
 		# remove attachments field from the session object
 		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {self.item_type :1} })
 
-class Attachments(ItemsInSessionMixin, ItemsInGridFSMixin):
+class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 	def __init__(self, db, session):
 		""" init subclasses with proper variables """
 		MongoApp.__init__(self, db)
@@ -68,17 +71,17 @@ class Attachments(ItemsInSessionMixin, ItemsInGridFSMixin):
 	def Insert(self, data, name):
 		""" Accepts the data to store"""
 		# Put the attachment in the gridfs and 
-		newid =	ItemsInGridFS.Insert(data, name)
-		ItemsInSession.Insert(newid)
+		newid =	ItemsInGridFSMixin.Insert(self, data, name)
+		ItemsInSessionMixin.Insert(self, newid)
 
 	def Flush(self):
 		# Remove all records
-		ItemsInGridFS.Flush(self)
-		ItemsInSession.Flush(self)
+		ItemsInGridFSMixin.Flush(self)
+		ItemsInSessionMixin.Flush(self)
 
 	def List(self):
 		print "Listing from session :"
-		ItemsInSessionMixin.List()
+		ItemsInSessionMixin.List(self)
 
 		print "Listing from grid :"
-		ItemsInGridFSMixin.List()
+		ItemsInGridFSMixin.List(self)
