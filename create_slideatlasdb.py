@@ -64,5 +64,12 @@ add_group(mongodb, '199923673454359','WSI Jeremy Kay', db_obj)
 
 sessions_in_group(mongodb, "add", '199923673454359' , "all")
 
+# Add K12 education
+db_obj = add_database(mongodb, server_name, "edu1", 'K-12 Education', 'Copyright &copy 2012, All rights reserved', 'April', 'April12')
+
+add_group(mongodb, '291414254276923','K-12 Education', db_obj) 
+
+sessions_in_group(mongodb, "add", '291414254276923' , "all")
+
 print "Done .."
 
