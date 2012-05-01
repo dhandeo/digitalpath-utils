@@ -3,27 +3,24 @@ import gridfs
 import bson
 import sys
 
-class MongoBase():
+class MongoApp():
 	"""
 	In future also manage the secure connection etc
 	"""	
 	def __init__(db):
 		self.db = db
 
-class ItemsInGridFS(MongoBase):
+class ItemsInGridFSMixin():
 	"""
-	Class and functions related with storing large items in gridfs
-	Does not stand on its own, requires self.db an initialized mongodb instance
+	Adds functionality for storing large items using gridfs
+	Does not stand on its own. Requires instance of MongoApp
 	"""
-	def __init__(self, item_type_string, db):
+	def __init__(self):
 		# create a gridfs session from known information
-		self.item_type = self.item_type_string
-		self.gf = gridfs.GridFS(self.db, self.item_type_string)
+		self.gf = gridfs.GridFS(self.db, self.item_type)
 	
 	def Flush(self):
-		# Remove all records
-		ItemsInSession.Flush(self)
-		print "Removing", self.item_type + "from system .."
+		print "Removing", self.item_type + "from grid .."
 		self.db[self.item_type + ".files"].drop()
 		self.db[self.item_type + ".chunks"].drop()
 
@@ -35,44 +32,38 @@ class ItemsInGridFS(MongoBase):
 		self.gf.put(data,filename=name, _id=newid)
 		return newid
 
-class ItemsInSession(MongoBase):
+class ItemsInSessionMixin():
 	"""
 	Derived classes neeed to take care of the individual storage and then add to the metadata using base class
 	Does not stand on its own, requires self.db an initialized mongodb instance
 	"""
-	def __init__(self, item_type_string, db, session):
+	def __init__(self, session):
 		""" accepts type of object, pymongo db instance, the root string to avoid conflicting names and sessions key """ 
-		self.item_type = item_type_string
-		self.db = db
 		self.session = session
-		print 'Root set at ', root
 
 	def Insert(self, newid):
 		""" Accepts the data to store"""
-		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$push' : { self.root : newid } })
-		pass
+		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$push' : { self.item_type : newid } })
 	
 	def List(self):
-		print 'GridFS Listing ..', self.gf.list()	
-
 		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
 
 		try :
-			print 'Session record ..', self.session['attachments']
+			print 'Session record ..', self.session[self.item_type]
 		except KeyError:
-			print 'No attachment record in the session'
-		
+			print 'No', self.item_type, 'record in the session'
 
 	def Flush(self):
 		# remove attachments field from the session object
-		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {self.root :1} })
+		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {self.item_type :1} })
 
-class Attachments(ItemsInSession, ItemsInGridFS):
-	def __init__(self, db, root, session):
+class Attachments(ItemsInSessionMixin, ItemsInGridFSMixin):
+	def __init__(self, db, session):
 		""" init subclasses with proper variables """
-		MongoBase.__init__(self, db)
-		self.igfs = ItemsInGridFS("attachments")
-		ItemsInSession.__init__(self, session)
+		MongoApp.__init__(self, db)
+		self.item_type = 'attachments'
+		ItemsInGridFSMixin.__init__(self)
+		ItemsInSessionMixin.__init__(self, session)
 
 	def Insert(self, data, name):
 		""" Accepts the data to store"""
@@ -85,8 +76,9 @@ class Attachments(ItemsInSession, ItemsInGridFS):
 		ItemsInGridFS.Flush(self)
 		ItemsInSession.Flush(self)
 
-	def Insert(self, data, name):
-		# Make sure initialized correctly
-		pass
-		# 
+	def List(self):
+		print "Listing from session :"
+		ItemsInSessionMixin.List()
 
+		print "Listing from grid :"
+		ItemsInGridFSMixin.List()
