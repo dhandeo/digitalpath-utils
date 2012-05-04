@@ -39,9 +39,22 @@ class ItemsInGridFSMixin():
 		self.gf.delete(deleteid)
 
 	def Get(self, getid):
-		out = self.gf.get(getid)
-		return out.read()
-
+		# Make sure getid 
+		try:
+			getid = bson.ObjectId(getid)
+			out = self.gf.get(getid)
+			return out
+		except:
+			print 'No objectid'
+			# find the id from filename
+		try:
+			out = self.gf.get_version(filename=getid)
+			return out
+		except:
+			print "No matching file found"
+	
+		return None	
+	
 class ItemsInSessionMixin():
 	"""
 	Derived classes neeed to take care of the individual storage and then add to the metadata using base class
@@ -118,28 +131,34 @@ class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 		print "Listing from grid :"
 		ItemsInGridFSMixin.List(self)
 
-	def Delete(self, deleteid):
+	def Delete(self, delete_key):
 		# make sure that the id exists
 
-		# TODO: start here		
-		bson.ObjectId(deleteid)
-
-
-		items = ItemsInSessionMixin.List(self)
-		
 		found = False
+
+		# TODO: start here		
+		try:
+			deleteid = bson.ObjectId(delete_key)
+			# Get the id from the name
+
+			items = ItemsInSessionMixin.List(self)
 	
-		for anitem in items:
-			if anitem['ref'] == deleteid:
-				found = deleteid
+			for anitem in items:
+				if anitem['ref'] == deleteid:
+					found = deleteid
 						
+		except:
+			print "Key is not ObjectId"
+		
 		if found:
-			print 'Item found ..'
+			print 'Deleting ..'
 
 			# Remove from session
 			ItemsInSessionMixin.Delete(self, deleteid)
 
 			# Remove from gridfs
 			ItemsInGridFSMixin.Delete(self, deleteid)
+		else:
+			print 'Nothing deleted' 
 
 

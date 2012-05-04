@@ -70,7 +70,7 @@ if __name__ == '__main__':
 			sys.exit(0)
 		else:
 			fout = open(output_path, 'w+')
-			fout.write(ac.Get(attachment_path))
+			fout.write(ac.Get(attachment_path).read())
 	
 	elif command == "delete":
 		ac.Delete(attachment_path)
