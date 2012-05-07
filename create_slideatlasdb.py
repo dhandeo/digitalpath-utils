@@ -39,9 +39,11 @@ sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 1")
 sessions_in_group(mongodb, "add", '302644506427080', "Slide Review 2")
 
 # Combined Derm Residents get access to both
-sessions_in_group(mongodb, "add", '231408953605826', "Session24")
+sessions_in_group(mongodb, "add", '231408953605826', "Session25")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 1")
 sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 2")
+sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 3")
+
 
 # Path residents 
 sessions_in_group(mongodb, "add", '365400966808177', "Slide Review 1")
