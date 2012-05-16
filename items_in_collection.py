@@ -149,6 +149,7 @@ class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 						
 		except:
 			print "Key is not ObjectId"
+			return
 		
 		if found:
 			print 'Deleting ..'

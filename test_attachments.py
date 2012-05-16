@@ -9,7 +9,7 @@ if __name__ == '__main__':
     # get the command line arguments
     if len(sys.argv) < 5:
         print 'incorrect usage'
-        print 'correct use: python test_attachments.py server database session_key command [path_to_attachment] [output_path]'
+        print 'correct use: python test_attachments.py server database command session_key [path_to_attachment] [output_path]'
         sys.exit(0)
 
     server = sys.argv[1]
