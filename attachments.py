@@ -9,13 +9,13 @@ if __name__ == '__main__':
     # get the command line arguments
     if len(sys.argv) < 5:
         print 'incorrect usage'
-        print 'correct use: python test_attachments.py server database command session_key [path_to_attachment] [output_path]'
+        print 'correct use: attachments.exe server database session_key command [path_to_attachment] [output_path]'
         sys.exit(0)
 
     server = sys.argv[1]
     database = sys.argv[2]
-    command = sys.argv[3]
-    session_key = sys.argv[4]
+    command = sys.argv[4]
+    session_key = sys.argv[3]
 
     # Try if attachment path is specified
     try:
