@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print "Find and delete"
 
     elif command == "list":
-        print ac.List()
+        ac.List()
 
     elif command == "flush":
         resp = raw_input('Are you sure you want to flush ?')

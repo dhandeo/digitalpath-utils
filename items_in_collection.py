@@ -32,8 +32,9 @@ class ItemsInGridFSMixin():
 		self.gf.put(data,filename=name, _id=newid)
 		return newid
 
-	def List(self):
-		print self.gf.list()
+	def List(self, fid):
+		item = self.gf.get(fid)
+		return item 
 
 	def Delete(self, deleteid):
 		self.gf.delete(deleteid)
@@ -91,11 +92,7 @@ class ItemsInSessionMixin():
 	def List(self):
 		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
 		try :
-			items =	self.session[self.item_type]
-			print 'Session record:'
-			for anitem in items:
-				print '  ', anitem
-			return items 
+			return self.session[self.item_type]
 
 		except KeyError:
 			print 'No', self.item_type, 'record in the session'
@@ -104,6 +101,24 @@ class ItemsInSessionMixin():
 	def Flush(self):
 		# remove attachments field from the session object
 		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {self.item_type :1} })
+
+	def Delete(self, deleteid):
+		# Remove the record in the session and possibly reorder
+		# verify if the attachment is listed in the session 
+
+		self.session = self.db['sessions'].find_one({'_id' : self.session['_id']})
+		attachments = self.session[self.item_type]	
+		print 'Before :', attachments
+		found = False
+		for anattachment in attachments:
+			if anattachment['ref'] == deleteid:
+				found = True
+				attachments.remove(anattachment)
+		
+		if found:
+			print "After: ", attachments
+			self.db['sessions'].update({'_id': self.session['_id']}, {'$set':{'attachments': attachments}})
+
 
 class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 	def __init__(self, db, session):
@@ -126,10 +141,11 @@ class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 
 	def List(self):
 		print "Listing from session :"
-		ItemsInSessionMixin.List(self)
-
-		print "Listing from grid :"
-		ItemsInGridFSMixin.List(self)
+		items = ItemsInSessionMixin.List(self)
+		
+		for anitem in items:
+			out = 	ItemsInGridFSMixin.List(self, anitem['ref'])
+			print anitem['pos'], out._id, out.name
 
 	def Delete(self, delete_key):
 		# make sure that the id exists
