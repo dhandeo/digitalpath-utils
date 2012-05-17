@@ -36,21 +36,22 @@ def session_in_group(mongodb, cmd, facebook_id, which):
 		pass
 	
 
-def sessions_in_group(mongodb, cmd, facebook_id, which_all):
+def sessions_in_group(mongodb, cmd, facebook_id, which_all, soft=False, debug=False):
 	# First find the group
 	agroup = mongodb["groups"].find_one({"facebook_id" : facebook_id})
 
 	if agroup <> None:
 		print "Group exists", agroup['facebook_id'], agroup['name'] 
 	else:
-		print "No group found"
-		return
+		print "Group", facebook_id, "NOT found"
+		return False
+
 	dbase = mongodb['databases'].find_one({'_id' : agroup['db']})
 
 	if dbase == None:
 		# We tried to add to a database which is not registered. Die
 		print "Database registration record not found"
-		sys.exit(0)
+		return False
  
 	#Connect to the registered 	
 	conn2 = pymongo.Connection(dbase['host'])
