@@ -48,6 +48,7 @@ sessions_in_group(mongodb, "add", '231408953605826', "Slide Review 3")
 # Path residents 
 sessions_in_group(mongodb, "add", '365400966808177', "Slide Review 1")
 sessions_in_group(mongodb, "add", '365400966808177', "Slide Review 2")
+sessions_in_group(mongodb, "add", '365400966808177', "Surgical Slide")
 
 # Add PAUL 
 db_obj = add_database(mongodb, server_name, "paul3", 'Washington University School of Medicine', 'Copyright &copy 2011-12, Paul Bridgman. All rights reserved', 'showme', 'MOmanage')
