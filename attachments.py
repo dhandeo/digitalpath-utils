@@ -58,8 +58,9 @@ if __name__ == '__main__':
     # Open the file if insert
     if command == "insert":
         try:
-            fin = open(attachment_path, "r+")
+            fin = open(attachment_path, "rb")
             attachdata = fin.read()
+            print len(attachdata), 'Bytes read'
         except:
             print "Cannot open attachment"
 
@@ -71,7 +72,7 @@ if __name__ == '__main__':
             print 'Output path is required'
             sys.exit(0)
         else:
-            fout = open(output_path, 'w+')
+            fout = open(output_path, 'wb')
             fout.write(ac.Get(attachment_path).read())
 
     elif command == "delete":
