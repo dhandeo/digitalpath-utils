@@ -1,13 +1,13 @@
 #vim:tabstop=2:softtabstop=2:shiftwidth=2:noexpandtab
 """
  Decodes the path info and fetches the corresponding tile from pymongo
- Accepts urls in the form of 
+ Accepts urls in the form of
       server/tile.py/database/collection/filename.jpg:
 """
 import pymongo
 from pymongo.binary import Binary
 import sys
-import Image 
+import Image
 import StringIO
 import math
 import os
@@ -21,49 +21,47 @@ sys.path.append(root_path)
 #sys.path.append('/var/www-dj/')
 #sys.path.append('/var/www/')
 
-from mongo import m 
-
 def error(message):
 	print 'ERROR: ' + message
 	sys.exit(1)
 
 def build_level(col, level, force=0):
-	
+
 	print 'Building a level: ' + str(level)
-  
+
 	# Assume a square shape with given level
 	total = col.find({'level' : level-1}).count()
 	if debug:
-		print total 
-	
+		print total
+
 	done = 0
 	printed_percent = 0
 	for arec in col.find({'level' : level-1}, {'name' : 1},timeout=False):
 		percent = float(done) / total * 100.0
 		this_name = arec['name']
 		prefix = this_name[:-5]
-		
+
 		# Find if already processed
 		if col.find_one({'name' : prefix + '.jpg', 'level' : level }) and not force:
 			if debug:
-				print 'Already processed ..' + str(prefix)  
+				print 'Already processed ..' + str(prefix)
 			# Find if the output exists and the neighbors
 			pass
 		else:
 			#Find neighbors
-			regexp = re.compile('^' + prefix) 
+			regexp = re.compile('^' + prefix)
 			if col.find({'name' : regexp , 'level' : level -1}).count():
 				# Create output image
 				newim = Image.new('RGB' ,
-					 (tilesize * 2, tilesize * 2), (128, 255, 128)) 
+					 (tilesize * 2, tilesize * 2), (255, 255, 255))
 				if debug:
 					print 'Prefix: ' + prefix
-			
+
 #				num_found = col.find({'name' : regexp, 'level' : level -1},timeout=False).count()
 #				if num_found > 4:
-#					print 'Num found ', num_found 
+#					print 'Num found ', num_found
 #
-				# Paste all the ancestors 
+				# Paste all the ancestors
 				for brec in col.find({'name' : regexp, 'level' : level -1},timeout=False):
 					chunk_name = brec['name']
 
@@ -78,23 +76,23 @@ def build_level(col, level, force=0):
 						pass
 					elif chunk_name[-5] == 't':
 						box = (0,tilesize)
-					
-					# Load the chunk 
+
+					# Load the chunk
 					im = Image.open(StringIO.StringIO(brec['file']))
 					if im.size[0] != tilesize or im.size[1] != tilesize:
 						print '#####'
-						print im.size 
+						print im.size
 						print '#####'
 					newim.paste(im, box)
 				# Done all the ancestors
 
-				# Resize it 
+				# Resize it
 				smallim = newim.resize((tilesize,tilesize),Image.ANTIALIAS)
 				if debug:
 					print smallim.size
 					smallim.save(prefix + '.jpg')
-				
-				# Compress it in memory  
+
+				# Compress it in memory
 				output = StringIO.StringIO()
 				smallim.save(output, format='JPEG')
 				contents = output.getvalue()
@@ -102,24 +100,24 @@ def build_level(col, level, force=0):
 
 				# Insert it back
 				try:
-					# Now we know we have some result 
-					# Try to store result in database 
-					res_obj = { 
+					# Now we know we have some result
+					# Try to store result in database
+					res_obj = {
 						'name' : prefix + '.jpg',
 						'level' : level,
 						'xs' : 0,
 						'ys' : 0,
 						'xe' : 0,
 						'ye' : 0,
-						'file' :  Binary(contents) 
+						'file' :  Binary(contents)
 						}
 					idd = coll.insert(res_obj)
-				except:	
+				except:
 					error('Could not insert')
-			
+
 			# Done processing for neighbors found
-			
-		# Done an unprocessed ancestor	
+
+		# Done an unprocessed ancestor
 		os.write(1,'\r   Done : %2.1f'%(percent) + '%')
 		done = done + 1
 
@@ -130,7 +128,7 @@ def build_level(col, level, force=0):
 	print '\nDone Level !'
 
 def construct_pyramid(col, level, force=0):
-	# Determine the highest level 
+	# Determine the highest level
 	item = col.find_one({'level' : 0},{'name' : 1, '_id' : 0})
 	highest_level = 	len(item['name']) - 4
 
@@ -141,14 +139,14 @@ def construct_pyramid(col, level, force=0):
 
 	# Until the level is zero
 	#if level >=1 :
- 
+
 
 
 if __name__ == '__main__':
 	# Get the command line arguments
 	if len(sys.argv) < 5:
-		print 'Incorrect usage' 
-		print 'Correct Use: python build_pyramid.py server database collection tilesize [force]' 
+		print 'Incorrect usage'
+		print 'Correct Use: python build_pyramid.py server database collection tilesize [force]'
 		sys.exit(0)
 	global tilesize
 	server = sys.argv[1]
@@ -160,35 +158,35 @@ if __name__ == '__main__':
 
 	if len(sys.argv) >= 6:
 		force = int(sys.argv[5])
-	print 'force', force 
+	print 'force', force
 
-	# Try opening the database	
-	conn = pymongo.Connection(server); 
+	# Try opening the database
+	conn = pymongo.Connection(server);
 	db = conn[database]
 
 	if collection == 'all':
-		
+
 		# loop over all collections
 
 		cols = db.collection_names()
 		cols.reverse()
 		print cols
 		for col_name in cols:
-			# skip if not an image collection 
+			# skip if not an image collection
 			if col_name[0:3] == 'sys':
 				continue
 
-			if force:
-				print 'Removing ..', coll.find({'level':{'$gt':0}}).count()
-				coll.remove({'level':{'$gt':0}});
-			
 			print 'Opening image : ' + col_name
 			coll = db[col_name]
 			coll.ensure_index('name')
+            if force:
+				print 'Removing ..', coll.find({'level':{'$gt':0}}).count()
+				coll.remove({'level':{'$gt':0}});
+
 			title = coll.find_one({'name':'t.jpg'},{'name':1})
 			if title == None or force:
 				print col_name + ' is not ready'
-				
+
 				construct_pyramid(coll, level)
 			else:
 				print col_name + ' is READY !!'
