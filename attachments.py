@@ -36,6 +36,7 @@ if __name__ == '__main__':
 
     except:
         print "Error opening ", database, " at ", server
+        sys.exit(0)
 
     if attachment_path:
         print "Attachment path specified"
