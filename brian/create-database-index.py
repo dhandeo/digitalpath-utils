@@ -87,6 +87,73 @@ def doWork(database):
         'can_see': [],
         'can_see_all': True
         },
+
+        {
+        '_id': bson.objectid.ObjectId('4ec45139114d972e0c000000'),
+        'name': 'mass_gen',
+        'label': 'Massachusetts General Hospital',
+        'db': databases_coll[0]['_id'], # bev1
+        'facebook_id' : '231677260223624'
+        'can_see': [
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd6'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd8'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd9'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdc'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd7'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd5'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bda'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdd'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdf'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be0'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be1'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdb'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bde')
+            ],
+        },
+        {
+        '_id': bson.objectid.ObjectId('4ec45139114d972e0c000001'),
+        'name': 'BIDMC',
+        'label': 'BIDMC',
+        'db': databases_coll[0]['_id'], # bev1
+        'facebook_id' : '320347061312744'
+        'can_see': [
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd6'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd8'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd9'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdc'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd7'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd5'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bda'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdd'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdf'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be0'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be1'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdb'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bde')
+            ],
+        },
+        {
+        '_id': bson.objectid.ObjectId('4ec45139114d972e0c000002'),
+        'name': 'new_mexico',
+        'label': 'New Mexico',
+        'db': databases_coll[0]['_id'], # bev1
+        'facebook_id' : '302644506427080'
+        'can_see': [
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd6'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd8'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd9'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdc'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd7'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bd5'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bda'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdd'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdf'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be0'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009be1'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bdb'),
+            bson.objectid.ObjectId('4ec4504824c1bf4b93009bde')
+            ],
+        },
         ]
 
     users_coll = [
@@ -143,12 +210,11 @@ def doWork(database):
         ]
 
     users_coll.append({
-        '_id': bson.objectid.ObjectId('500923e3a4219560c57b8397'),
-        'type': 'passwd',
-        'name': 'all',
-        'label': 'All Databases',
-        'passwd': 'foo',
-        'groups': [group['_id'] for group in groups_coll]
+        '_id': bson.objectid.ObjectId('50113a264a6899b228fdefca'),
+        'type': 'google',
+        'name': 'brian.helba@kitware.com',
+        'label': 'Brian Helba',
+        'groups': [group['_id'] for group in groups_coll[0:5]]
         })
 
     coll = pymongo.collection.Collection(database, 'databases')
