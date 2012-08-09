@@ -1,4 +1,4 @@
-# vim: set tabstop=2 shiftwidth=2 expandtab
+# Command line tool for dealing with file attachments 
 
 from items_in_collection import *
 from common_utils import *

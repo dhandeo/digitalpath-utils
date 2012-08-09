@@ -1,6 +1,5 @@
-# Follow from main but example usage
-# python add_groups.py localhost slideatlas
-
+# Command line tool and function code for managing image items 
+# (please reuse if possible)
 # adds or delets images from sessions 
 # The image must already exist
 

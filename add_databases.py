@@ -1,5 +1,4 @@
-
-# Template for database util
+# Rules operations 
 
 import sys, pymongo
 
@@ -21,12 +20,12 @@ if __name__ == '__main__':
 	argDBName = sys.argv[2]
 	try:
 			connTimeout = 10
-			connection = pymongo.connection.Connection(argHostname, argHostport, network_timeout = connTimeout)
+			connection = pymongo.connection.Connection(argHostname, argHostport, network_timeout=connTimeout)
 			try:
 					database = pymongo.database.Database(connection, argDBName)
-					doWork(database)            
+					doWork(database)
 			except pymongo.errors.InvalidName as e:
-					print "Error: database name \"%s\" is not valid: %s" %(argDBName, e.message)
+					print "Error: database name \"%s\" is not valid: %s" % (argDBName, e.message)
 					exit(1)
 	except pymongo.errors.AutoReconnect as e:
 			print "Error: could not connect to MongoDB server at \"%s:%d\"" % (argHostname, argHostport)

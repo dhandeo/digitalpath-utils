@@ -1,3 +1,4 @@
+# Tools for creating rules " Please reuse some code"
 
 # Follow from main but example usage
 # python add_groups.py localhost slideatlas
@@ -8,16 +9,16 @@ def add_group(mongodb, facebook_id, name, db):
 	agroup = mongodb["groups"].find_one({"facebook_id" : facebook_id})
 
 	if agroup <> None:
-		print "Group exists", agroup['facebook_id'], agroup['name'] 
+		print "Group exists", agroup['facebook_id'], agroup['name']
 	else:
 		print "No group found, adding newly"
 
 		# create a python dictionary to add 
 		group_obj = {}
 
-		group_obj['facebook_id'] = facebook_id 
-		group_obj['label'] = name 
-		group_obj['name'] = name 
+		group_obj['facebook_id'] = facebook_id
+		group_obj['label'] = name
+		group_obj['name'] = name
 		group_obj['db'] = db
 
 		mongodb['groups'].insert(group_obj)
@@ -34,14 +35,14 @@ def session_in_group(mongodb, cmd, facebook_id, which):
 
 	elif cmd == "del":
 		pass
-	
+
 
 def sessions_in_group(mongodb, cmd, facebook_id, which_all, soft=False, debug=False):
 	# First find the group
 	agroup = mongodb["groups"].find_one({"facebook_id" : facebook_id})
 
 	if agroup <> None:
-		print "Group exists", agroup['facebook_id'], agroup['name'] 
+		print "Group exists", agroup['facebook_id'], agroup['name']
 	else:
 		print "Group", facebook_id, "NOT found"
 		return False
@@ -52,18 +53,18 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all, soft=False, debug=Fa
 		# We tried to add to a database which is not registered. Die
 		print "Database registration record not found"
 		return False
- 
+
 	#Connect to the registered 	
 	conn2 = pymongo.Connection(dbase['host'])
-	
+
 	# Open the group and get the name of the database 
-	db = conn2[dbase['dbname']] 
+	db = conn2[dbase['dbname']]
 
 	# Gather the sessions  
 	col_sessions = db['sessions']
-			
+
 	# Create a list of sessions (All by default)
-	sessions = col_sessions.find(sort=[('name',pymongo.ASCENDING)])
+	sessions = col_sessions.find(sort=[('name', pymongo.ASCENDING)])
 	sessions_list = []
 
 	print 'List of sessions available in this database :'
@@ -84,7 +85,7 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all, soft=False, debug=Fa
 			session_in_group(mongodb, cmd, facebook_id, asession[0])
 
 	else:
-		isnumber = False 
+		isnumber = False
 		try:
 			val = int(which_all)
 			isnumber = True
@@ -105,49 +106,49 @@ def sessions_in_group(mongodb, cmd, facebook_id, which_all, soft=False, debug=Fa
 				print "  ", cmd, facebook_id, "Adding sorted"
 				for asession in sessions_list[which_all:]:
 					session_in_group(mongodb, cmd, facebook_id, asession[0])
-		
+
 def manually_add_groups(conn, database):
 	# Calls the add group function for different facebook groups 
 	mongodb = conn[database]
 	# Not adding sessions
 
 	# Bev;s groups 
-	add_group(mongodb, '365400966808177','Pathology Residents and Fellows BIDMC', "bev1") 
-	add_group(mongodb, '302644506427080','Dermatology Residents UNM', "bev1")
-	add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training Program',"bev1")
+	add_group(mongodb, '365400966808177', 'Pathology Residents and Fellows BIDMC', "bev1")
+	add_group(mongodb, '302644506427080', 'Dermatology Residents UNM', "bev1")
+	add_group(mongodb, '231408953605826', 'Combined Dermatology Residency Training Program', "bev1")
 
-	add_group(mongodb, '320347061312744','Histology WUSM', "paul2") 
-	
+	add_group(mongodb, '320347061312744', 'Histology WUSM', "paul2")
+
 	# Adding sessions one by one 
 
 	sessions_in_group(mongodb, "add", '365400966808177', -2)
 	sessions_in_group(mongodb, "add", '302644506427080', -2)
 	sessions_in_group(mongodb, "add", '231408953605826', -2)
-                             
+
 	sessions_in_group(mongodb, "add", '320347061312744', "all")
 
 # Mangually updated facebook groups and corresponding databases etc
 if __name__ == '__main__':
 	# get the command line arguments
 	if len(sys.argv) < 3:
-		print 'incorrect usage' 
-		print 'correct use: python add_groups.py server database [force]' 
+		print 'incorrect usage'
+		print 'correct use: python add_groups.py server database [force]'
 		sys.exit(0)
 
 	server = sys.argv[1]
 	database = sys.argv[2]
 
 	# Cleanup if force parameter specified
-	try:	
-		force = int(sys.argv[3]) 
+	try:
+		force = int(sys.argv[3])
 	except:
 		force = 0
 
 	# Try opening the database	
-	conn = pymongo.Connection(server); 
+	conn = pymongo.Connection(server);
 
 	if force:
-		print "Trying to drop groups collection ..", 
+		print "Trying to drop groups collection ..",
 		conn[database].drop_collection('groups')
 
 	manually_add_groups(conn, database)
@@ -158,9 +159,9 @@ if __name__ == '__main__':
 	col_sessions = db['sessions']
 	col_groups = db['groups']
 
-			
+
 	# Create a list of sessions (All by default)
-	sessions = col_sessions.find(sort=[('name',pymongo.DESCENDING)])
+	sessions = col_sessions.find(sort=[('name', pymongo.DESCENDING)])
 	sessions_list = []
 
 	print 'List of sessions available in this database :'
@@ -169,7 +170,7 @@ if __name__ == '__main__':
 		print count, ') ', session['_id']
 		sessions_list.append((session['_id'], session['name']))
 		count = count + 1
-	
+
 	print "Done "
 
 	print sessions_list
@@ -188,7 +189,7 @@ if __name__ == '__main__':
 
 	for agroup in groups:
 		print 'Processing group : ', agroup
-	
+
 		# create a python dictionary to add 
 		group_obj = {}
 

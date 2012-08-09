@@ -1,3 +1,6 @@
+# Interpreting XSL file sent by bev , 
+# perhaps reusable code for importing questions or other metainformation quickly
+
 import csv
 
 # Import the book chapters csv
@@ -6,7 +9,7 @@ import sys
 def error(no):
 	if(no == 1):
 		print 'Missing parameters ..'
-		print 'Usage: ' + sys.argv[0] + ' input.csv server:port databasename' 
+		print 'Usage: ' + sys.argv[0] + ' input.csv server:port databasename'
 
 	elif(no == 2):
 		print 'Error opening database ' + sys.argv[2] + ' ' + sys.argv[3]
@@ -33,8 +36,8 @@ except:
 
 sys.exit(0)
 
-try:	
-	f = open(sys.argv[1],'rb')
+try:
+	f = open(sys.argv[1], 'rb')
 
 	reader = csv.reader(f)
 	count = 0
@@ -43,15 +46,15 @@ try:
 		if row[0] == '' and row[1] == '':
 			# Ignore when first two cols are blank
 			if title <> None :
-				print '   %d records ..\n'%(count) 
-				title = None 
+				print '   %d records ..\n' % (count)
+				title = None
 			continue
 
 		if row[0] == '' and row[1] <> '':
 			# Set the new title title
 			title = row[1]
 			count = 0
-			print 'Title : ' + title 
+			print 'Title : ' + title
 
 		if row[0] <> '':
 			# This is some slide information

@@ -1,3 +1,5 @@
+# Should be named Attachments.py
+
 import pymongo
 import gridfs
 import bson
@@ -7,7 +9,7 @@ class MongoApp():
 	"""
 	In future also manage the secure connection etc
 	"""
-	def __init__(self,db):
+	def __init__(self, db):
 		self.db = db
 
 class ItemsInGridFSMixin():
@@ -29,7 +31,7 @@ class ItemsInGridFSMixin():
 		# Put the attachment in the gridfs and call the base insertion to add the id in the session
 		newid = bson.ObjectId()
 		# Store the id in the grid file system
-		self.gf.put(data,filename=name, _id=newid)
+		self.gf.put(data, filename=name, _id=newid)
 		return newid
 
 	def List(self, fid):
@@ -100,7 +102,7 @@ class ItemsInSessionMixin():
 
 	def Flush(self):
 		# remove attachments field from the session object
-		self.db['sessions'].update( { "_id" : self.session['_id']}, {'$unset' : {self.item_type :1} })
+		self.db['sessions'].update({ "_id" : self.session['_id']}, {'$unset' : {self.item_type :1} })
 
 	def Delete(self, deleteid):
 		# Remove the record in the session and possibly reorder
@@ -131,7 +133,7 @@ class Attachments(MongoApp, ItemsInSessionMixin, ItemsInGridFSMixin):
 	def Insert(self, data, name):
 		""" Accepts the data to store"""
 		# Put the attachment in the gridfs and
-		newid =	ItemsInGridFSMixin.Insert(self, data, name)
+		newid = 	ItemsInGridFSMixin.Insert(self, data, name)
 		ItemsInSessionMixin.Insert(self, newid)
 
 	def Flush(self):

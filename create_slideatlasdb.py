@@ -1,3 +1,5 @@
+# First priority to have sim ilar functionality
+
 import pymongo
 import sys
 

@@ -1,5 +1,5 @@
 """
-	Used to manually delete chapters and all associated images.
+	Used to manually change session label delete chapters and all associated images.
 	This pseudo code will be later used to write php function
 """
 import pymongo
@@ -16,8 +16,8 @@ def error(message):
 if __name__ == '__main__':
 	# Get the command line arguments
 	if len(sys.argv) < 5:
-		print 'Incorrect usage' 
-		print 'Correct Use: python rename_chapter.py server database chapter new_chapter' 
+		print 'Incorrect usage'
+		print 'Correct Use: python rename_chapter.py server database chapter new_chapter'
 		sys.exit(0)
 
 	server = sys.argv[1]
@@ -27,30 +27,30 @@ if __name__ == '__main__':
 
 	# Try opening the database	
 	try:
-		conn = pymongo.Connection(server); 
+		conn = pymongo.Connection(server);
 		db = conn[database]
-		
+
 		# Get the chapter id
 
 		chapters = db['chapters']
-		print "Chapters : " + str( chapters.find().count())
+		print "Chapters : " + str(chapters.find().count())
 
 		# Try to find 
 
 		this_chapter = chapters.find_one({'name': chapter})
 		print this_chapter
-		
+
 		if this_chapter == None:
 			print "No chapter of that name"
 			print "Exiting"
 			sys.exit(1)
-		
+
 		print "Found " + str(this_chapter['_id'])
 
 		# Remove this record from chapters
-		chapters.update({'_id' : this_chapter['_id']},\
+		chapters.update({'_id' : this_chapter['_id']}, \
 			{'$set': { 'name': new_chapter}})
-		
+
 	except:
 		strr = 'Error in the operations'
 		error(strr)
